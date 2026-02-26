@@ -1,0 +1,89 @@
+---
+config:
+  theme: base
+  look: rounded
+---
+flowchart LR
+    %% 1. Sources Block - Vertical Stack
+    subgraph Sources ["Sources"]
+        direction TB
+        S_Icon["📥"]
+        SRC_CRM["📁<br/><b>CRM Folder</b><br/><small>CSV / Files</small>"]
+        SRC_ERP["🗄️<br/><b>SQL Server</b><br/><small>Direct Link</small>"]
+        
+        %% Vertical Sub-lines
+        S_Icon --> SRC_CRM --> SRC_ERP
+    end
+
+    %% The Main Data Warehouse Container
+    subgraph DWH ["<b>Data Warehouse</b>"]
+        
+        %% 2. Bronze - Vertical Stack
+        subgraph Bronze ["<b>Bronze Layer</b>"]
+            direction TB
+            B_SP["<div style='color:#fff; background:#2E86C1; border-radius:4px; padding:4px'>&lt;/&gt;</div><small>Stored Procedure</small>"]
+            B_DB[("🛢️<br/>Raw Data")]
+            B_Meta["<div style='text-align:left;font-size:10px'><b>Object:</b> Tables<br/><b>Load:</b> Batch / Full<br/><b>Model:</b> As-Is</div>"]
+            
+            %% Vertical Sub-lines
+            B_SP --> B_DB --> B_Meta
+        end
+
+        %% 3. Silver - Vertical Stack
+        subgraph Silver ["<b>Silver Layer</b>"]
+            direction TB
+            S_SP["<div style='color:#fff; background:#2E86C1; border-radius:4px; padding:4px'>&lt;/&gt;</div><small>Stored Procedure</small>"]
+            S_DB[("🛢️<br/>Cleaned Data")]
+            S_Meta["<div style='text-align:left;font-size:10px'><b>Object:</b> Tables<br/><b>Transform:</b><br/>• Cleansing<br/>• Normalization</div>"]
+            
+            %% Vertical Sub-lines
+            S_SP --> S_DB --> S_Meta
+        end
+
+        %% 4. Gold - Vertical Stack
+        subgraph Gold ["<b>Gold Layer</b>"]
+            direction TB
+            G_G_Icon["🥇"]
+            G_DB[("🛢️<br/>Business Ready")]
+            G_Meta["<div style='text-align:left;font-size:10px'><b>Object:</b> Views<br/><b>Model:</b> Star Schema<br/><b>Aggregations</b></div>"]
+            
+            %% Vertical Sub-lines
+            G_G_Icon --> G_DB --> G_Meta
+        end
+
+        %% Horizontal Flow between DWH blocks
+        Bronze ==> Silver
+        Silver ==> Gold
+    end
+
+    %% 5. Consumption Block - Vertical Stack
+    subgraph Consume ["Consume"]
+        direction TB
+        C_Icon["🚀"]
+        C1["📊 <b>BI Reporting</b>"]
+        C2["🔍 <b>SQL Queries</b>"]
+        C3["🤖 <b>ML Models</b>"]
+        
+        %% Vertical Sub-lines
+        C_Icon --> C1 --> C2 --> C3
+    end
+
+    %% Final Horizontal Pipeline
+    Sources ==> Bronze
+    Gold ==> Consume
+
+    %% Styling
+    style DWH fill:#fcfcfc,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5
+    style Sources fill:#fff,stroke:#ccc,stroke-dasharray: 2 2
+    style Consume fill:#fff,stroke:#ccc,stroke-dasharray: 2 2
+    
+    style Bronze fill:#fff,stroke:#edb98e,stroke-width:2px
+    style Silver fill:#fff,stroke:#a6a6a6,stroke-width:2px
+    style Gold fill:#fff,stroke:#f9e3a3,stroke-width:2px
+    
+    %% Remove default box styling for icons/procs
+    style B_SP fill:none,stroke:none
+    style S_SP fill:none,stroke:none
+    style G_G_Icon fill:none,stroke:none
+    style S_Icon fill:none,stroke:none
+    style C_Icon fill:none,stroke:none
