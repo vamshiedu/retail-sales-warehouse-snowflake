@@ -1,19 +1,16 @@
-use database snowflake_sample_data;
-desc table tpcds_sf100tcl.store_sales;
-select count(*) from tpcds_sf100tcl.store_sales;
-use warehouse compute_wh;
-use database snowflake_learning_db;
-create schema if not exists bronze;
-create or replace table bronze.store_sales_raw 
-as select * from snowflake_sample_data.tpcds_sf100tcl.store_sales
-limit 50000000;
----phase 3 : data validation
+-- Recreate bronze layer
+USE WAREHOUSE COMPUTE_WH;
+USE DATABASE SNOWFLAKE_LEARNING_DB;
 
-select count(*) from bronze.store_sales_raw;
-select count(*) from snowflake_sample_data.tpcds_sf100tcl.store_sales;
-desc table bronze.store_sales_raw;
-select count(*)  as total_rows,
-count(ss_sales_price) as non_null_sales_price 
-from bronze.store_sales_raw;
----optional : check for duplicates
-select min(ss_sold_date_sk) , max(ss_sold_date_sk) from bronze.store_sales_raw;
+CREATE OR REPLACE TABLE BRONZE.STORE_SALES_RAW AS
+SELECT ss.*
+FROM SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.STORE_SALES ss
+JOIN SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.DATE_DIM d
+    ON ss.ss_sold_date_sk = d.d_date_sk
+WHERE d.d_year BETWEEN 1998AND 2010;
+
+-- validate it 
+SELECT MIN(d.d_year), MAX(d.d_year)
+FROM BRONZE.STORE_SALES_RAW ss
+JOIN SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.DATE_DIM d
+    ON ss.ss_sold_date_sk = d.d_date_sk;

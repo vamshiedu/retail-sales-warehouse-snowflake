@@ -1,17 +1,17 @@
 USE  WAREHOUSE COMPUTE_WH;
 USE DATABASE SNOWFLAKE_LEARNING_DB;
-create schema if not exists GOLD;
+create schema if not exists gold;
 CREATE OR REPLACE TABLE GOLD.SALES_BY_STATE AS
 SELECT
-    d.state,
+    D.state,
     SUM(f.sales_price) AS total_sales
 FROM
     SILVER.FACT_SALES f
 JOIN
     SILVER.CUSTOMER_DIM d ON f.customer_sk = d.customer_sk
-GROUP BY d.state;
+group by d.state;
 SELECT * FROM GOLD.SALES_BY_STATE LIMIT 10;
-CREATE OR REPLACE TABLE GOLD.SALES_BY_YEAR AS
+CREATE OR REPLACE TABLE GOLD.SALES_BY_YAER AS
 SELECT
     YEAR(transaction_date) AS sales_year,
     SUM(sales_price) AS total_sales
@@ -38,6 +38,6 @@ LIMIT 10;
 SELECT COUNT(*) FROM GOLD.MONTHLY_SALES;
 SELECT COUNT(*) FROM GOLD.TOP_STORES;
 SELECT COUNT(*) FROM GOLD.SALES_BY_STATE;
-SELECT COUNT(*) FROM GOLD.SALES_BY_YEAR;
+SELECT COUNT(*) FROM GOLD.SALES_BY_YAER;
 select sum(sales_price) from silver.fact_sales;
 select sum(total_sales) from gold.sales_by_state;
